@@ -14,4 +14,7 @@
   /*draw particles as circles:*/
   border-radius: 50%;
   background-color: hsl(60, 100%, 80%);
+  /* stagger animation */
+  /*  animation-delay: calc(var(--animation-order) * 2ms); */
 }
+
