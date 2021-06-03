@@ -1,0 +1,17 @@
+:host {
+  display: block;
+  background-color: hsl(30, 3%, 14%);
+  width: 300px;
+  height: 300px;
+}
+
+.anime-container {
+  position: relative;
+}
+
+.anime-container .dot{
+  position: absolute;
+  /*draw particles as circles:*/
+  border-radius: 50%;
+  background-color: hsl(60, 100%, 80%);
+}
