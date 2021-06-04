@@ -1,4 +1,5 @@
 import {Component, Element, h, Host} from '@stencil/core';
+import '@ionic/core';
 import {createAnimation} from '@ionic/core';
 
 @Component({
@@ -11,100 +12,39 @@ export class OkParticleTrail {
   @Element()
   el: HTMLElement;
 
-  aHost!: HTMLDivElement;
-
-  createParcticleGroupAnimation (particles: NodeList, delay: number){
-    // get all particles with the same data-delay
-    return createAnimation()
-      .addElement(particles)
-      .duration(1250)
-      .iterations(1)
-      .easing('linear')
-      .delay(delay * 20)
-      // .keyframes([
-      //   { offset: 0, opacity: '0'},
-      //   { offset: 0.3, opacity: '1' },
-      //   { offset: 1.0, opacity: '0' }
-      // ]);
-      .fromTo('opacity', '0', '1');
-  }
-
-  hideParcticleGroupAnimation (particles: NodeList, delay: number){
-    // get all particles with the same data-delay
-    return createAnimation()
-      .addElement(particles)
-      .duration(1250)
-      .iterations(1)
-      .easing('linear')
-      .delay(delay * 20)
-      // .keyframes([
-      //   { offset: 0, opacity: '0'},
-      //   { offset: 0.3, opacity: '1' },
-      //   { offset: 1.0, opacity: '0' }
-      // ]);
-     .fromTo('opacity', '1', '0');
-  }
-
-
-  private groupBy(list: any [], key: number | string) {
-    return list.reduce((accu, val) => {
-      const group = val[key] ?? val.getAttribute(key);
-      const arr = (accu[group] || []);
-      accu[group] = arr.concat([val]);
-      return accu;
-    }, {});
-  }
-
-  createParticlesAnimation() {
-    // create animation for each div and delay them, then join the animations
-    // TODO: Test if this can be replaced by element refs into an array
-    const particles = this.aHost.querySelectorAll('div.dot');
-    const group = this.groupBy(Array.from(particles), "data-delay");
-    const animations = Object.entries(group).map(([key, value]) => {
-      return this.createParcticleGroupAnimation(value as unknown as NodeList, Number(key));
-    });
-
-    return createAnimation()
-      .duration(12500)
-      .iterations(Infinity)
-      .addAnimation(animations);
-  }
-
-  hideParticlesAnimation() {
-    // create animation for each div and delay them, then join the animations
-    // TODO: Test if this can be replaced by element refs into an array
-    const particles = this.aHost.querySelectorAll('div.dot');
-    const group = this.groupBy(Array.from(particles), "data-delay");
-    const animations = Object.entries(group).map(([key, value]) => {
-      return this.hideParcticleGroupAnimation(value as unknown as NodeList, Number(key));
-    });
-
-    return createAnimation()
-      .duration(1250)
-      .iterations(Infinity)
-      .addAnimation(animations);
-  }
-
-  private getRandomInt(min: number, max: number) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
+  particles: HTMLDivElement [] = [];
 
   async componentDidLoad () {
     window.setTimeout(async () => {
+      const groups = this.groupBy(Array.from(this.particles), "data-delay");
+      const showAnimations = this.createShowAnimations(groups);
+      const hideAnimations = this.createHideAnimations(groups);
+      const show = this.createParticlesAnimation(showAnimations);
+      const hide = this.hideParticlesAnimation(hideAnimations);
+      // play attribute
       while(true) {
-        await this.createParticlesAnimation().play();
-        this.createParticlesAnimation().pause();
-        await this.hideParticlesAnimation().play();
-        this.hideParticlesAnimation().pause();
+        await show.play();
+        show.stop();
+        await hide.play();
+        hide.stop();
       }
     })
     return true;
   }
 
-  drawParticles() {
-    const density = 12;
+  render() {
+    return (
+      <Host>
+        <div
+          class={'anime-container'}>
+          {this.drawParticles()}
+        </div>
+      </Host>
+    );
+  }
+
+  private drawParticles() {
+    const density = 15;
     const length = 110;
     return [...Array(length).keys()].map((i) => {
       const angle = 0.1 * i;
@@ -116,7 +56,7 @@ export class OkParticleTrail {
     });
   }
 
-  drawParticle(position: {x: number, y: number},index: number ,count = 15) {
+  private drawParticle(position: {x: number, y: number},index: number ,count = 30) {
     return [...Array(count).keys()].map(() => {
       const size = this.getRandomInt(5, 10);
       const style = {
@@ -127,20 +67,76 @@ export class OkParticleTrail {
         backgroundColor: "hsl(60, 100%, 80%)",
         opacity: "0"
       } as any;
-      return <div data-delay={index} class={'dot'} style={style}/>;
+      return <div ref={ (el) => {
+        this.particles = [...this.particles, el];
+      }}  data-delay={index} class={'dot'} style={style}/>;
     });
   }
 
-  render() {
-    return (
-      <Host>
-        <div ref={ (el) => {
-          this.aHost = el;
-        }} class={'anime-container'}>
-          {this.drawParticles()}
-        </div>
-      </Host>
-    );
+  private createParcticleGroupAnimation (particles: NodeList, delay: number){
+    // get all particles with the same data-delay
+    return createAnimation()
+      .addElement(particles)
+      .duration(1250)
+      .iterations(1)
+      .easing('linear')
+      .delay(delay * 20)
+      .fromTo('opacity', '0', '1');
+  }
+
+  private hideParcticleGroupAnimation (particles: NodeList, delay: number){
+    // get all particles with the same data-delay
+    return createAnimation()
+      .addElement(particles)
+      .duration(1250)
+      .iterations(1)
+      .easing('linear')
+      .delay(delay * 20)
+      .fromTo('opacity', '1', '0');
+  }
+
+  private createParticlesAnimation(animations) {
+    // create animation for each div and delay them, then join the animations
+
+    return createAnimation()
+      .duration(12500)
+      .iterations(Infinity)
+      .addAnimation(animations);
+  }
+
+  private hideParticlesAnimation(animations) {
+    // create animation for each div and delay them, then join the animations
+    return createAnimation()
+      .duration(1250)
+      .iterations(Infinity)
+      .addAnimation(animations);
+  }
+
+  private createShowAnimations(groups: Record<string, HTMLDivElement[]>) {
+    return  Object.entries(groups).map(([key, value]) => {
+      return this.createParcticleGroupAnimation(value as unknown as NodeList, Number(key));
+    });
+  }
+
+  private createHideAnimations (groups: Record<string, HTMLDivElement []>) {
+    return Object.entries(groups).map(([key, value]) => {
+      return this.hideParcticleGroupAnimation(value as unknown as NodeList, Number(key));
+    });
+  }
+
+  private getRandomInt(min: number, max: number) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  private groupBy(list: any [], key: number | string) {
+    return list.reduce((accu, val) => {
+      const group = val[key] ?? val.getAttribute(key);
+      const arr = (accu[group] || []);
+      accu[group] = arr.concat([val]);
+      return accu;
+    }, {});
   }
 
 }
