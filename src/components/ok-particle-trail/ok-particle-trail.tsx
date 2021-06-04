@@ -69,12 +69,10 @@ export class OkParticleTrail {
         height: size + "px",
         left: position.x + this.getRandomInt(this.scattering.minus, this.scattering.plus) + "px",
         top: position.y + this.getRandomInt(this.scattering.minus, this.scattering.plus) + "px",
-        backgroundColor: "hsl(60, 100%, 80%)",
-        opacity: "0"
       } as any;
       return <div ref={ (el) => {
         this.particles = [...this.particles, el];
-      }}  data-delay={index} class={'dot'} style={style}/>;
+      }} data-delay={index} class={'particle'} style={style}/>;
     });
   }
 
