@@ -14,6 +14,11 @@ export class OkParticleTrail {
 
   particles: HTMLDivElement [] = [];
 
+  private scattering = {
+    minus: -10,
+    plus: 10
+  }
+
   async componentDidLoad () {
     window.setTimeout(async () => {
       const groups = this.groupBy(Array.from(this.particles), "data-delay");
@@ -62,8 +67,8 @@ export class OkParticleTrail {
       const style = {
         width: size + "px",
         height: size + "px",
-        left: position.x + this.getRandomInt(-15, 15) + "px",
-        top: position.y + this.getRandomInt(-15, 15) + "px",
+        left: position.x + this.getRandomInt(this.scattering.minus, this.scattering.plus) + "px",
+        top: position.y + this.getRandomInt(this.scattering.minus, this.scattering.plus) + "px",
         backgroundColor: "hsl(60, 100%, 80%)",
         opacity: "0"
       } as any;
