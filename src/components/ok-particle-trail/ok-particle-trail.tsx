@@ -14,6 +14,10 @@ export class OkParticleTrail {
 
   particles: HTMLDivElement [] = [];
 
+  private density = 15;
+  private length = 110;
+  private angleStep = 0.1;
+
   private scattering = {
     minus: -10,
     plus: 10
@@ -49,20 +53,18 @@ export class OkParticleTrail {
   }
 
   private drawParticles() {
-    const density = 15;
-    const length = 110;
-    return [...Array(length).keys()].map((i) => {
-      const angle = 0.1 * i;
+    return this.range(this.length).map((i) => {
+      const angle = this.angleStep * i;
       const innerWidth = this.el.offsetWidth;
       const innerHeight = this.el.offsetHeight;
-      const x = (density * angle) * Math.cos(angle) + innerWidth / 2;
-      const y = (density * angle) * Math.sin(angle) + innerHeight / 2;
+      const x = (this.density * angle) * Math.cos(angle) + innerWidth / 2;
+      const y = (this.density * angle) * Math.sin(angle) + innerHeight / 2;
       return this.drawParticle({x, y}, i)
     });
   }
 
   private drawParticle(position: {x: number, y: number},index: number ,count = 30) {
-    return [...Array(count).keys()].map(() => {
+    return this.range(count).map(() => {
       const size = this.getRandomInt(5, 10);
       const style = {
         width: size + "px",
@@ -143,6 +145,10 @@ export class OkParticleTrail {
       accu[group] = arr.concat([val]);
       return accu;
     }, {});
+  }
+
+  private range(length: number){
+    return [...Array(length).keys()];
   }
 
 }
