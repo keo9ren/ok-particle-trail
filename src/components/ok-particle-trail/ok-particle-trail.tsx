@@ -14,14 +14,16 @@ export class OkParticleTrail {
 
   particles: HTMLDivElement [] = [];
 
-  private density = 15;
-  private length = 110;
+  private density = 13;
+  private length = 105;
   private angleStep = 0.1;
 
   private scattering = {
     minus: -10,
     plus: 10
   }
+
+  private particlePerAngle = 15;
 
   async componentDidLoad () {
     window.setTimeout(async () => {
@@ -63,7 +65,7 @@ export class OkParticleTrail {
     });
   }
 
-  private drawParticle(position: {x: number, y: number},index: number ,count = 30) {
+  private drawParticle(position: {x: number, y: number},index: number ,count = this.particlePerAngle) {
     return this.range(count).map(() => {
       const size = this.getRandomInt(5, 10);
       const style = {
