@@ -67,13 +67,16 @@ export class OkParticleTrail {
       const style = {
         width: size + "px",
         height: size + "px",
-        left: position.x + this.getRandomInt(this.scattering.minus, this.scattering.plus) + "px",
-        top: position.y + this.getRandomInt(this.scattering.minus, this.scattering.plus) + "px",
+        transform: `translate3d(${this.getScatteredPosition(position.x)}, ${this.getScatteredPosition(position.y)}, 0px)`,
       } as any;
       return <div ref={ (el) => {
         this.particles = [...this.particles, el];
       }} data-delay={index} class={'particle'} style={style}/>;
     });
+  }
+
+  private getScatteredPosition(basePos: number) {
+    return basePos + this.getRandomInt(this.scattering.minus, this.scattering.plus) + "px";
   }
 
   private createParcticleGroupAnimation (particles: NodeList, delay: number){
