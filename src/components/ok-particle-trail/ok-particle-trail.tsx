@@ -72,7 +72,7 @@ export class OkParticleTrail {
         width: size + "px",
         height: size + "px",
         transform: `translate3d(${this.getScatteredPosition(position.x)}, ${this.getScatteredPosition(position.y)}, 0px)`,
-      } as any;
+      };
       return <div ref={ (el) => {
         this.particles = [...this.particles, el];
       }} data-delay={index} class={'particle'} style={style}/>;
@@ -83,7 +83,7 @@ export class OkParticleTrail {
     return basePos + this.getRandomInt(this.scattering.minus, this.scattering.plus) + "px";
   }
 
-  private createParcticleGroupAnimation (particles: NodeList, delay: number){
+  private createParcticleGroupAnimation (particles: HTMLDivElement [], delay: number){
     // get all particles with the same data-delay
     return createAnimation()
       .addElement(particles)
@@ -94,7 +94,7 @@ export class OkParticleTrail {
       .fromTo('opacity', '0', '1');
   }
 
-  private hideParcticleGroupAnimation (particles: NodeList, delay: number){
+  private hideParcticleGroupAnimation (particles: HTMLDivElement [], delay: number){
     // get all particles with the same data-delay
     return createAnimation()
       .addElement(particles)
@@ -124,13 +124,13 @@ export class OkParticleTrail {
 
   private createShowAnimations(groups: Record<string, HTMLDivElement[]>) {
     return  Object.entries(groups).map(([key, value]) => {
-      return this.createParcticleGroupAnimation(value as unknown as NodeList, Number(key));
+      return this.createParcticleGroupAnimation(value, Number(key));
     });
   }
 
   private createHideAnimations (groups: Record<string, HTMLDivElement []>) {
     return Object.entries(groups).map(([key, value]) => {
-      return this.hideParcticleGroupAnimation(value as unknown as NodeList, Number(key));
+      return this.hideParcticleGroupAnimation(value, Number(key));
     });
   }
 
@@ -140,9 +140,9 @@ export class OkParticleTrail {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  private groupBy(list: any [], key: number | string) {
+  private groupBy<T extends HTMLDivElement>(list: T [], key: number | string): Record<string, HTMLDivElement[]> {
     return list.reduce((accu, val) => {
-      const group = val[key] ?? val.getAttribute(key);
+      const group = val.getAttribute(String(key));
       const arr = (accu[group] || []);
       accu[group] = arr.concat([val]);
       return accu;
